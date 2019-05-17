@@ -18,6 +18,7 @@ class Overview extends Component {
         {"id":6, "initials":"HB", "picks":["36689","01810","25804"]},
         {"id":7, "initials":"PM", "picks":["28237","33204","25198"]}],
       golfers: {},
+      lastUpdate: null,
     };
   }
 
@@ -28,10 +29,14 @@ class Overview extends Component {
        .then(response => response.json())
        .then(data => {
          console.log(data);
-         returnData.rawData = data.leaderboard.players;
+         //returnData.rawData = data.leaderboard.players;
          returnData.objData = _.mapKeys(data.leaderboard.players, 'player_id');
-         console.log(returnData);
-         this.setState({ golfers: returnData.objData })
+         //console.log(returnData);
+         const now = new Date();
+         this.setState(
+           { golfers: returnData.objData,
+             lastUpdate: now.toLocaleString("en-GB")
+          });
        });
   }
 
@@ -75,10 +80,11 @@ class Overview extends Component {
   }
 
   render() {
-    const { players } = this.state;
+    const { players,lastUpdate } = this.state;
 
     return (
       <div className="container">
+        <div>Last Updated: {lastUpdate}</div>
         {players.map(player =>
           <div key={player.id}  className="card mt-2 mb-2">
             <div className="card-header">
