@@ -1,0 +1,6 @@
+#Get ID of current event:
+https://statdata.pgatour.com/r/current/message.json
+
+#Use tid from above where 033 is below for leaderboard
+
+https://statdata.pgatour.com/r/033/leaderboard-v2mini.json
