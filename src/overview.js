@@ -68,12 +68,16 @@ class Overview extends Component {
   }
 
   calculatePlayerTotal = (golferArray) => {
-    let returnScore = 0;
+    let returnScore = {};
+    returnScore.totalScore = 0;
+    returnScore.status = 'Active';
     golferArray.forEach( (golferId) => {
-      if(!(golferId in this.state.golfers)){
-        returnScore = returnScore;
-      } else {
-        returnScore = returnScore + parseInt(this.state.golfers[golferId].total)
+      if((golferId in this.state.golfers)){
+        returnScore.totalScore = returnScore.totalScore + parseInt(this.state.golfers[golferId].total)
+        console.log('checking cut status: ',this.state.golfers[golferId].player_bio.last_name, " Status: ", this.state.golfers[golferId].status);
+        if(this.state.golfers[golferId].status==='cut'){
+          returnScore.status = 'Cut'
+        }
       }
     })
     return returnScore;
@@ -87,8 +91,8 @@ class Overview extends Component {
         <div>Last Updated: {lastUpdate}</div>
         {players.map(player =>
           <div key={player.id}  className="card mt-2 mb-2">
-            <div className="card-header">
-              <strong>{player.initials} - Total Score: <span style={{color: this.calculatePlayerTotal(player.picks) < 0 ? "red" : "blue"}}>{this.calculatePlayerTotal(player.picks)}</span></strong>
+            <div className={"card-header" + (this.calculatePlayerTotal(player.picks).status === 'Cut' ? ' mc-header' : '')}>
+              <strong>{player.initials} - Total Score: <span style={{color: this.calculatePlayerTotal(player.picks).totalScore < 0 ? "red" : "blue"}}>{this.calculatePlayerTotal(player.picks).totalScore}</span> {this.calculatePlayerTotal(player.picks).status}</strong>
             </div>
             {this.renderGolferList(player.picks)}
           </div>
