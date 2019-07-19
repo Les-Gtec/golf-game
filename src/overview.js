@@ -72,34 +72,48 @@ class Overview extends Component {
     )
   }
 
-  calculatePlayerTotal = (golferArray) => {
-    let returnScore = {};
-    returnScore.totalScore = 0;
-    returnScore.status = 'Active';
-    golferArray.forEach( (golferId) => {
-      if((golferId in this.state.golfers)){
-        returnScore.totalScore = returnScore.totalScore + parseInt(this.state.golfers[golferId].total)
-        console.log('checking cut status: ',this.state.golfers[golferId].player_bio.last_name, " Status: ", this.state.golfers[golferId].status);
+  updatePlayerScore = (player) => {
+
+    player.totalScore = 0;
+    player.status = 'Active';
+
+    player.picks.forEach( (golferId) => {
+      if((golferId in this.state.golfers)) {
+        player.totalScore = player.totalScore + parseInt(this.state.golfers[golferId].total);
+        
+        // console.log('checking cut status: ', this.state.golfers[golferId].player_bio.last_name, " Status: ", this.state.golfers[golferId].status);
         if(this.state.golfers[golferId].status==='cut'){
-          returnScore.status = 'Cut'
+          player.status = 'Cut';
         }
       }
-    })
-    return returnScore;
+    });
   }
 
   render() {
     const { players,lastUpdate } = this.state;
 
+    // Update each player with live scores and status
+    players.forEach( (nextPlayer) => {
+      this.updatePlayerScore(nextPlayer);
+    });
+
+    // Sort the player list descending by totalScore
+    const sortedPlayers = Object.values(players).sort((playerA, playerB) => {
+      return playerA.totalScore > playerB.totalScore
+    });
+
+    console.log("sortedPlayers: ", sortedPlayers);
+
+    // Render the sorted player list
     return (
       <div className="container">
         <div>Last Updated: {lastUpdate}</div>
-        {players.map(player =>
-          <div key={player.id}  className="card mt-2 mb-2">
-            <div className={"card-header" + (this.calculatePlayerTotal(player.picks).status === 'Cut' ? ' mc-header' : '')}>
-              <strong>{player.initials} - Total Score: <span style={{color: this.calculatePlayerTotal(player.picks).totalScore < 0 ? "red" : "blue"}}>{this.calculatePlayerTotal(player.picks).totalScore}</span> {this.calculatePlayerTotal(player.picks).status}</strong>
+        {sortedPlayers.map(nextPlayer =>
+          <div key={nextPlayer.id}  className="card mt-2 mb-2">
+            <div className={"card-header" + (nextPlayer.status === 'Cut' ? ' mc-header' : '')}>
+              <strong>{nextPlayer.initials} - Total Score: <span style={{color: nextPlayer.totalScore < 0 ? "red" : "blue"}}>{nextPlayer.totalScore}</span> {nextPlayer.status}</strong>
             </div>
-            {this.renderGolferList(player.picks)}
+            {this.renderGolferList(nextPlayer.picks)}
           </div>
         )}
       </div>
