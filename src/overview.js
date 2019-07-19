@@ -35,10 +35,10 @@ class Overview extends Component {
     fetch(API)
        .then(response => response.json())
        .then(data => {
-         console.log(data);
+         //console.log(data);
          //returnData.rawData = data.leaderboard.players;
          returnData.objData = _.mapKeys(data.leaderboard.players, 'player_id');
-         console.log('cut line ',data.leaderboard.cut_line.cut_line_score);
+         //console.log('cut line ',data.leaderboard.cut_line.cut_line_score);
          const now = new Date();
          this.setState(
            { golfers: returnData.objData,
@@ -61,7 +61,7 @@ class Overview extends Component {
     const { player_bio } = specificGolfer;
     let playingStatus = 'Not Started';
     let missingCut = false;
-    console.log('golfer: ', specificGolfer);
+    //console.log('golfer: ', specificGolfer);
     if(specificGolfer.thru && specificGolfer.current_round === this.state.current_round){
       if(specificGolfer.thru === 18){
         playingStatus = 'Round finished'
@@ -138,7 +138,7 @@ class Overview extends Component {
       return playerA.totalScore - playerB.totalScore
     });
 
-    console.log("sortedPlayers: ", sortedPlayers);
+    //console.log("sortedPlayers: ", sortedPlayers);
 
     // Render the sorted player list
     return (
