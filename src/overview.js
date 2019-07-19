@@ -24,6 +24,8 @@ class Overview extends Component {
         {"id":12, "initials":"AG", "picks":["29454","48887","34046"]}],
       golfers: {},
       lastUpdate: null,
+      current_round:0,
+      cut_line:0,
     };
   }
 
@@ -36,11 +38,13 @@ class Overview extends Component {
          console.log(data);
          //returnData.rawData = data.leaderboard.players;
          returnData.objData = _.mapKeys(data.leaderboard.players, 'player_id');
-         //console.log(returnData);
+         console.log('cut line ',data.leaderboard.cut_line.cut_line_score);
          const now = new Date();
          this.setState(
            { golfers: returnData.objData,
-             lastUpdate: now.toLocaleString("en-GB")
+             lastUpdate: now.toLocaleString("en-GB"),
+             current_round: data.leaderboard.current_round,
+             cut_line_score: data.leaderboard.cut_line.cut_line_score
           });
        });
   }
@@ -55,10 +59,26 @@ class Overview extends Component {
     }
     const specificGolfer = this.state.golfers[golferId];
     const { player_bio } = specificGolfer;
+    let playingStatus = 'Not Started';
+    let missingCut = false;
+    console.log('golfer: ', specificGolfer);
+    if(specificGolfer.thru && specificGolfer.current_round === this.state.current_round){
+      if(specificGolfer.thru === 18){
+        playingStatus = 'Round finished'
+      } else {
+        playingStatus = `On Course thru: ${specificGolfer.thru}`
+      }
+    }
+    if(specificGolfer.status === 'cut'){
+      playingStatus = 'Cut'
+    }
+    if(specificGolfer.total > this.state.cut_line_score){
+      missingCut = true;
+    }
 
     return (
       <li className="list-group-item" key={golferId}>
-        {specificGolfer.current_position} {player_bio.first_name} {player_bio.last_name} - Score: <span style={{color: specificGolfer.total < 0 ? "red" : "blue"}}>{specificGolfer.total}</span>
+        {specificGolfer.current_position} {player_bio.first_name} {player_bio.last_name} - Score: <span style={{color: specificGolfer.total < 0 ? "red" : "blue"}}>{specificGolfer.total}</span> - {playingStatus} {missingCut ? <span style={{color: "red"}}>Missing Cut</span> : <span />}
       </li>
     )
   }
@@ -80,7 +100,7 @@ class Overview extends Component {
     player.picks.forEach( (golferId) => {
       if((golferId in this.state.golfers)) {
         player.totalScore = player.totalScore + parseInt(this.state.golfers[golferId].total);
-        
+
         // console.log('checking cut status: ', this.state.golfers[golferId].player_bio.last_name, " Status: ", this.state.golfers[golferId].status);
         if(this.state.golfers[golferId].status==='cut'){
           player.status = 'Cut';
@@ -89,8 +109,24 @@ class Overview extends Component {
     });
   }
 
+  renderCutLine = (current_round, cut_line_score) => {
+    if(parseInt(current_round)>2){
+      return (
+        <div>
+          It's the weekend
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          Proj. Cut: {cut_line_score}
+        </div>
+      )
+    }
+  }
+
   render() {
-    const { players,lastUpdate } = this.state;
+    const { players,lastUpdate, current_round, cut_line_score } = this.state;
 
     // Update each player with live scores and status
     players.forEach( (nextPlayer) => {
@@ -99,7 +135,7 @@ class Overview extends Component {
 
     // Sort the player list descending by totalScore
     const sortedPlayers = Object.values(players).sort((playerA, playerB) => {
-      return playerA.totalScore > playerB.totalScore
+      return playerA.totalScore - playerB.totalScore
     });
 
     console.log("sortedPlayers: ", sortedPlayers);
@@ -107,7 +143,22 @@ class Overview extends Component {
     // Render the sorted player list
     return (
       <div className="container">
-        <div>Last Updated: {lastUpdate}</div>
+      <header>
+          <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container navbar-brand d-flex justify-content-between">
+                <div>
+                  <strong>Golf Sweepstake</strong>
+                </div>
+                <div>
+                  Round: {current_round}
+                </div>
+                  { this.renderCutLine(current_round, cut_line_score)}
+                <div>
+                   Updated: {lastUpdate}
+                </div>
+            </div>
+          </div>
+        </header>
         {sortedPlayers.map(nextPlayer =>
           <div key={nextPlayer.id}  className="card mt-2 mb-2">
             <div className={"card-header" + (nextPlayer.status === 'Cut' ? ' mc-header' : '')}>
