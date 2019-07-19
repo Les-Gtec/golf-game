@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 
-const API = 'https://statdata.pgatour.com/r/033/leaderboard-v2mini.json';
+const API = 'https://statdata.pgatour.com/r/100/leaderboard-v2mini.json';
 //const DEFAULT_QUERY = 'redux';
 
 class Overview extends Component {
@@ -10,13 +10,18 @@ class Overview extends Component {
 
     this.state = {
       players: [
-        {"id":1, "initials":"LM", "picks":["28237","24138","21528"]},
-        {"id":2, "initials":"NK", "picks":["28237","27064","46970"]},
-        {"id":3, "initials":"CB", "picks":["22405","30911","40098"]},
-        {"id":4, "initials":"JOB", "picks":["35450","24502","26329"]},
-        {"id":5, "initials":"RB", "picks":["08793","34046","33204"]},
-        {"id":6, "initials":"HB", "picks":["36689","01810","25804"]},
-        {"id":7, "initials":"PM", "picks":["28237","33204","25198"]}],
+        {"id":1, "initials":"NK", "picks":["28237","46970","34242"]},
+        {"id":2, "initials":"LM", "picks":["28237","25572","24138"]},
+        {"id":3, "initials":"JR", "picks":["26329","25364","33204"]},
+        {"id":4, "initials":"CB", "picks":["30911","22405","34360"]},
+        {"id":5, "initials":"JOB", "picks":["32102","26329","26499"]},
+        {"id":6, "initials":"RB", "picks":["25572","26329","32839"]},
+        {"id":7, "initials":"HB", "picks":["28237","36689","37250"]},
+        {"id":8, "initials":"PM", "picks":["28237","24138","01810"]},
+        {"id":9, "initials":"JaG", "picks":["36689","08793","29970"]},
+        {"id":10, "initials":"JoG", "picks":["36689","08793","27349"]},
+        {"id":11, "initials":"MF", "picks":["46970","29454","24138"]},
+        {"id":12, "initials":"AG", "picks":["29454","48887","34046"]}],
       golfers: {},
       lastUpdate: null,
     };
