@@ -72,7 +72,7 @@ class Overview extends Component {
     if(specificGolfer.status === 'cut'){
       playingStatus = 'Cut'
     }
-    if(specificGolfer.total > this.state.cut_line_score){
+    if(this.state.current_round < 3 && specificGolfer.total > this.state.cut_line_score){
       missingCut = true;
     }
 
@@ -125,6 +125,12 @@ class Overview extends Component {
     }
   }
 
+  cmpPlayers = (a, b) => {
+    if (a > b) return +1;
+    if (a < b) return -1;
+    return 0;
+  }
+
   render() {
     const { players,lastUpdate, current_round, cut_line_score } = this.state;
 
@@ -134,8 +140,11 @@ class Overview extends Component {
     });
 
     // Sort the player list descending by totalScore
+    // const sortedPlayers = Object.values(players).sort((playerA, playerB) => {
+    //   return playerA.totalScore - playerB.totalScore
+    // });
     const sortedPlayers = Object.values(players).sort((playerA, playerB) => {
-      return playerA.totalScore - playerB.totalScore
+      return this.cmpPlayers(playerA.status, playerB.status) || this.cmpPlayers(playerA.totalScore, playerB.totalScore)
     });
 
     //console.log("sortedPlayers: ", sortedPlayers);
@@ -162,7 +171,7 @@ class Overview extends Component {
         {sortedPlayers.map(nextPlayer =>
           <div key={nextPlayer.id}  className="card mt-2 mb-2">
             <div className={"card-header" + (nextPlayer.status === 'Cut' ? ' mc-header' : '')}>
-              <strong>{nextPlayer.initials} - Total Score: <span style={{color: nextPlayer.totalScore < 0 ? "red" : "blue"}}>{nextPlayer.totalScore}</span> {nextPlayer.status}</strong>
+              <strong>{nextPlayer.initials} - Total Score: <span style={{color: (nextPlayer.status !== 'Cut' && nextPlayer.totalScore) < 0 ? "red" : "blue"}}>{nextPlayer.totalScore}</span> {nextPlayer.status}</strong>
             </div>
             {this.renderGolferList(nextPlayer.picks)}
           </div>
