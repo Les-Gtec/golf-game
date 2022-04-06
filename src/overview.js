@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 
-const API = 'https://statdata.pgatour.com/r/100/leaderboard-v2mini.json';
+const API = 'https://golf-leaderboard-data.p.rapidapi.com/leaderboard/456';
 //const DEFAULT_QUERY = 'redux';
 
 class Overview extends Component {
@@ -10,18 +10,15 @@ class Overview extends Component {
 
     this.state = {
       players: [
-        {"id":1, "initials":"NK", "picks":["28237","46970","34242"]},
-        {"id":2, "initials":"LM", "picks":["28237","25572","24138"]},
-        {"id":3, "initials":"JR", "picks":["26329","25364","33204"]},
-        {"id":4, "initials":"CB", "picks":["30911","22405","34360"]},
-        {"id":5, "initials":"JOB", "picks":["32102","26329","26499"]},
-        {"id":6, "initials":"RB", "picks":["25572","26329","32839"]},
-        {"id":7, "initials":"HB", "picks":["28237","36689","37250"]},
-        {"id":8, "initials":"PM", "picks":["28237","24138","01810"]},
-        {"id":9, "initials":"JaG", "picks":["36689","08793","29970"]},
-        {"id":10, "initials":"JoG", "picks":["36689","08793","27349"]},
-        {"id":11, "initials":"MF", "picks":["46970","29454","24138"]},
-        {"id":12, "initials":"AG", "picks":["29454","48887","34046"]}],
+        {"id":1, "initials":"NK", "picks":["107689","106366","88276"]},
+        {"id":2, "initials":"JGl", "picks":["63643","144259","92791"]},
+        {"id":3, "initials":"PM", "picks":["99628","84727","63643"]},
+        {"id":4, "initials":"RB", "picks":["99628","26395","84772"]},
+        {"id":5, "initials":"LM", "picks":["99628","84727","103096"]},
+        {"id":6, "initials":"CB", "picks":["99628","26395","136474"]},
+        {"id":7, "initials":"AZ", "picks":["73522","79003","140167"]},
+        {"id":8, "initials":"AB", "picks":["140167","151591","136594"]},
+        {"id":9, "initials":"JOB", "picks":["142465","142528","136474"]}],
       golfers: {},
       lastUpdate: null,
       current_round:0,
@@ -32,21 +29,30 @@ class Overview extends Component {
   componentDidMount() {
     //Wil get live data here
     let returnData = {};
-    fetch(API)
-       .then(response => response.json())
+    fetch(API, {
+	    "method": "GET",
+	    "headers": {
+		    "x-rapidapi-key": "af4dd1cadfmsh382b6fa5593ccb8p1e139fjsnefe3f4bcd52e",
+		    "x-rapidapi-host": "golf-leaderboard-data.p.rapidapi.com"
+	    }
+    })
+    .then(response => response.json())
        .then(data => {
-         //console.log(data);
+         console.log(data.results.leaderboard);
          //returnData.rawData = data.leaderboard.players;
-         returnData.objData = _.mapKeys(data.leaderboard.players, 'player_id');
-         //console.log('cut line ',data.leaderboard.cut_line.cut_line_score);
+         returnData.objData = _.mapKeys(data.results.leaderboard, 'player_id');
+        //  //console.log('cut line ',data.leaderboard.cut_line.cut_line_score);
          const now = new Date();
          this.setState(
            { golfers: returnData.objData,
              lastUpdate: now.toLocaleString("en-GB"),
-             current_round: data.leaderboard.current_round,
-             cut_line_score: data.leaderboard.cut_line.cut_line_score
-          });
-       });
+             current_round: data.results.tournament.live_details.current_round,
+             cut_line_score: data.results.tournament.live_details.cut_value
+          })
+        })
+    .catch(err => {
+	    console.error(err);
+    });
   }
 
   renderGolfer = (golferId) => {
@@ -62,23 +68,23 @@ class Overview extends Component {
     let playingStatus = 'Not Started';
     let missingCut = false;
     //console.log('golfer: ', specificGolfer);
-    if(specificGolfer.thru && specificGolfer.current_round === this.state.current_round){
-      if(specificGolfer.thru === 18){
+    if(specificGolfer.holes_played && specificGolfer.current_round === this.state.current_round){
+      if(specificGolfer.holes_played === 18){
         playingStatus = 'Round finished'
       } else {
-        playingStatus = `On Course thru: ${specificGolfer.thru}`
+        playingStatus = `On Course thru: ${specificGolfer.holes_played}`
       }
     }
     if(specificGolfer.status === 'cut'){
       playingStatus = 'Cut'
     }
-    if(this.state.current_round < 3 && specificGolfer.total > this.state.cut_line_score){
+    if(this.state.current_round < 3 && specificGolfer.total_to_par > this.state.cut_line_score){
       missingCut = true;
     }
 
     return (
       <li className="list-group-item" key={golferId}>
-        {specificGolfer.current_position} {player_bio.first_name} {player_bio.last_name} - Score: <span style={{color: specificGolfer.total < 0 ? "red" : "blue"}}>{specificGolfer.total}</span> - {playingStatus} {missingCut ? <span style={{color: "red"}}>Missing Cut</span> : <span />}
+        {specificGolfer.current_position} {specificGolfer.first_name} {specificGolfer.last_name} - Score: <span style={{color: specificGolfer.total_to_par < 0 ? "red" : "blue"}}>{specificGolfer.total_to_par}</span> - {playingStatus} {missingCut ? <span style={{color: "red"}}>Missing Cut</span> : <span />}
       </li>
     )
   }
@@ -99,7 +105,7 @@ class Overview extends Component {
 
     player.picks.forEach( (golferId) => {
       if((golferId in this.state.golfers)) {
-        player.totalScore = player.totalScore + parseInt(this.state.golfers[golferId].total);
+        player.totalScore = player.totalScore + parseInt(this.state.golfers[golferId].total_to_par);
 
         // console.log('checking cut status: ', this.state.golfers[golferId].player_bio.last_name, " Status: ", this.state.golfers[golferId].status);
         if(this.state.golfers[golferId].status==='cut'){
