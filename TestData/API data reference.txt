@@ -8,3 +8,17 @@ https://statdata.pgatour.com/r/033/leaderboard-v2mini.json
 
 #the odds link 705f28fb967fb32831db3680bc5c9d14
 https://the-odds-api.com/liveapi/guides/v3/samples.html
+
+
+# Using Rapid api
+Required Headers:
+headers: {
+    'X-RapidAPI-Key': 'af4dd1cadfmsh382b6fa5593ccb8p1e139fjsnefe3f4bcd52e',
+    'X-RapidAPI-Host': 'golf-leaderboard-data.p.rapidapi.com'
+  }
+
+Step 1 - get fixture using:
+'https://golf-leaderboard-data.p.rapidapi.com/fixtures/2/2021', 2 parameters are tour id and year (1 for European and 2 for year)
+
+Step 3 get leader board with:
+https://golf-leaderboard-data.p.rapidapi.com/leaderboard/436 where parameter is the event id

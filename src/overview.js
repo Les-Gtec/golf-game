@@ -10,15 +10,13 @@ class Overview extends Component {
 
     this.state = {
       players: [
-        {"id":1, "initials":"NK", "picks":["107689","106366","88276"]},
-        {"id":2, "initials":"JGl", "picks":["63643","144259","92791"]},
-        {"id":3, "initials":"PM", "picks":["99628","84727","63643"]},
-        {"id":4, "initials":"RB", "picks":["99628","26395","84772"]},
-        {"id":5, "initials":"LM", "picks":["99628","84727","103096"]},
-        {"id":6, "initials":"CB", "picks":["99628","26395","136474"]},
-        {"id":7, "initials":"AZ", "picks":["73522","79003","140167"]},
-        {"id":8, "initials":"AB", "picks":["140167","151591","136594"]},
-        {"id":9, "initials":"JOB", "picks":["142465","142528","136474"]}],
+        {"id":1, "initials":"NK", "picks":["120226","670","118438"]},
+        {"id":2, "initials":"JGl", "picks":["123640","120226","115333"]},
+        {"id":3, "initials":"PM", "picks":["102088","109483","92167"]},
+        {"id":4, "initials":"RB", "picks":["109483","106129","102181"]},
+        {"id":5, "initials":"LM", "picks":["102088","109483","1477"]},
+        {"id":6, "initials":"CB", "picks":["106129","5839","130246"]},
+        {"id":9,"initials":"JGa", "picks":["109483","120226","92167"]}],
       golfers: {},
       lastUpdate: null,
       current_round:0,
@@ -56,7 +54,9 @@ class Overview extends Component {
   }
 
   renderGolfer = (golferId) => {
+    console.log('GolferID:',golferId);
     if(!(golferId in this.state.golfers)){
+      console.log('golfer not found!');
       return (
         <li className="list-group-item" key={golferId}>
           Waiting for data for golfer: {golferId}
@@ -64,6 +64,7 @@ class Overview extends Component {
       )
     }
     const specificGolfer = this.state.golfers[golferId];
+    console.log('found golfer: ',specificGolfer);
     const { player_bio } = specificGolfer;
     let playingStatus = 'Not Started';
     let missingCut = false;
